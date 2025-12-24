@@ -98,5 +98,3 @@ grpcurl -plaintext -import-path proto -proto proto/greeter.proto \
 - サーバ実装: `cmd/server/main.go`
 
 ---
-
-何か追記してほしい内容（例：Docker 起動手順、Makefile、CI の設定など）があれば教えてください。

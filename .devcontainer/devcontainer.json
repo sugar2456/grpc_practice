@@ -14,7 +14,10 @@
 				"golang.Go"
 			]
 		}
-	}
+	},
+
+	// Dockerfileで作成したappuserを使用
+	"remoteUser": "appuser",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
