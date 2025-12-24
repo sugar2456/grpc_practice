@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package greeter;
+
+option go_package = "grpc_practice/pb";
+
+// 挨拶サービス
+service Greeter {
+  // 単純なリクエスト/レスポンス
+  rpc SayHello (HelloRequest) returns (HelloReply);
+
+  // サーバーストリーミング
+  rpc SayHelloStream (HelloRequest) returns (stream HelloReply);
+}
+
+message HelloRequest {
+  string name = 1;
+}
+
+message HelloReply {
+  string message = 1;
+}
