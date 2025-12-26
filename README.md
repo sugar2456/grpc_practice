@@ -1,100 +1,109 @@
 # grpc_practice
 
-簡単な gRPC サービスのサンプルです（`proto/greeter.proto` → 生成された `pb/*.pb.go` が含まれます）。この README では、開発環境の前提、プロトコルバッファの再生成方法、サーバ起動と動作確認手順を記載しています。 ✅
+Connect-go を使った gRPC サービスのサンプルです。Connect は gRPC、gRPC-Web、Connect プロトコルをサポートし、ブラウザから直接アクセスできます。
 
 ---
 
-## 前提（Prerequisites） 🔧
-- Go 1.24 以上
-- protoc（Protocol Buffers コンパイラ）
-- 以下のツール（必要に応じてインストール）:
-  - `protoc-gen-go`
-  - `protoc-gen-go-grpc`
-  - `grpcurl`（動作確認用）
+## 前提（Prerequisites）
 
-インストール例（Go のツール）:
-
-```bash
-# protoc-gen-go / protoc-gen-go-grpc
-go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-
-# grpcurl (コマンドラインから gRPC を叩く場合)
-go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
-```
-
+- Docker
+- Make
 
 ---
 
-## .proto からコードを再生成する
-`proto/greeter.proto` を編集した場合、Go 用のコードを再生成してください:
+## セットアップ
 
 ```bash
-protoc --go_out=. --go_opt=paths=source_relative \
-       --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-       proto/greeter.proto
+# protoファイルからコードを生成
+make proto
+
+# go.sum を更新
+make tidy
 ```
-
-生成されるファイル: `grpc_practice/pb/greeter.pb.go`, `grpc_practice/pb/greeter_grpc.pb.go`（既に含まれています）
-
-> **注意**: 生成ファイルは直接編集しないでください。`.proto` を編集して再生成するのが正しいワークフローです。
 
 ---
 
-## サーバをビルド / 起動する
-
-プロジェクト全体のビルド確認:
+## サーバを起動する
 
 ```bash
-go build ./...
+make run
 ```
 
-サーバを起動する（開発用、ポート `:50051`）:
-
-```bash
-# フォアグラウンドで起動 (Ctrl+C で停止)
-go run ./cmd/server
-
-# バックグラウンドで起動してログを残す
-nohup go run ./cmd/server > server.log 2>&1 &
-```
-
-起動するとログに `server started at :50051` が出ます。
+サーバがポート `8081` で起動します。
 
 ---
 
-## grpcurl で動作確認（おすすめ）
+## 動作確認
 
-`grpcurl` を使うと、ローカルの gRPC サーバを簡単に呼べます（プレーンテキスト接続）:
+curl で直接 JSON を送れます（Connect の利点）:
 
 ```bash
-grpcurl -plaintext -import-path proto -proto proto/greeter.proto \
-  -d '{"name":"Alice"}' localhost:50051 greeter.Greeter/SayHello
+curl -X POST http://localhost:8081/greeter.Greeter/SayHello \
+  -H "Content-Type: application/json" \
+  -d '{"name": "World"}'
 ```
 
 期待されるレスポンス:
 
 ```json
-{ "message": "Hello Alice" }
+{"message":"Hello, World!"}
 ```
 
 ---
 
-## サーバ停止方法
-- フォアグラウンド: Ctrl+C
-- バックグラウンド: プロセスを確認して `kill <PID>` または `pkill -f "go run ./cmd/server"`
+## Makefile コマンド一覧
+
+| コマンド | 説明 |
+|----------|------|
+| `make build` | Docker イメージをビルド |
+| `make run` | サーバーを起動（ポート 8081） |
+| `make shell` | コンテナにシェルで入る |
+| `make proto` | proto ファイルをコンパイル |
+| `make tidy` | go mod tidy を実行 |
+| `make clean` | 生成ファイルを削除 |
+
+ポートを変更したい場合:
+
+```bash
+make run PORT=9000
+```
 
 ---
 
-## 追加案 (任意)
-- `bufconn` を使ったユニットテストの追加（ネットワーク不要で CI 向け）
-- `grpc-gateway` を導入して `curl` で確認できる HTTP/JSON エンドポイントを用意
+## プロジェクト構成
+
+```
+grpc_practice/
+├── Dockerfile
+├── Makefile
+├── go.mod
+├── proto/
+│   └── greeter.proto      # サービス定義
+├── gen/                   # 生成コード（make proto で生成）
+│   └── greeter/v1/
+│       ├── greeter.pb.go
+│       └── greeterv1connect/
+│           └── greeter.connect.go
+└── cmd/
+    └── server/
+        └── main.go        # サーバー実装
+```
+
+---
+
+## gRPC vs Connect
+
+| 項目 | gRPC | Connect |
+|------|------|---------|
+| ブラウザ対応 | Envoy プロキシ必要 | 直接対応 |
+| HTTP | HTTP/2 のみ | HTTP/1.1, HTTP/2 |
+| 動作確認 | grpcurl 必要 | curl で OK |
 
 ---
 
 ## 参考
-- proto: `proto/greeter.proto`
-- 生成コード: `grpc_practice/pb/`
-- サーバ実装: `cmd/server/main.go`
 
----
+- [Connect-go 公式ドキュメント](https://connectrpc.com/docs/go/getting-started)
+- proto: `proto/greeter.proto`
+- 生成コード: `gen/greeter/v1/`
+- サーバー実装: `cmd/server/main.go`

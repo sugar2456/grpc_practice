@@ -13,10 +13,9 @@ RUN apt update && apt install -y protobuf-compiler && rm -rf /var/lib/apt/lists/
 # appuserに切り替え
 USER appuser
 
-# Goツールのインストール
+# Goツールのインストール（Connect用）
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-RUN go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+RUN go install connectrpc.com/connect/cmd/protoc-gen-connect-go@latest
 
 # PATHにgo binを追加
 ENV PATH="$PATH:/home/appuser/go/bin"

@@ -2,41 +2,70 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
-	"net"
+	"net/http"
 	"os"
 	"os/signal"
 
-	pb "grpc_practice/grpc_practice/pb"
+	"connectrpc.com/connect"
+	greeterv1 "grpc_practice/gen/greeter/v1"
+	"grpc_practice/gen/greeter/v1/greeterv1connect"
 
-	"google.golang.org/grpc"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 )
 
-type server struct {
-	pb.UnimplementedGreeterServer
+type GreeterServer struct{}
+
+func (s *GreeterServer) SayHello(
+	ctx context.Context,
+	req *connect.Request[greeterv1.HelloRequest],
+) (*connect.Response[greeterv1.HelloReply], error) {
+	log.Printf("Request: %v", req.Msg.Name)
+	res := connect.NewResponse(&greeterv1.HelloReply{
+		Message: fmt.Sprintf("Hello, %s!", req.Msg.Name),
+	})
+	return res, nil
 }
 
-func (s *server) SayHello(ctx context.Context, req *pb.HelloRequest) (*pb.HelloReply, error) {
-	return &pb.HelloReply{Message: "Hello " + req.GetName()}, nil
+func (s *GreeterServer) SayHelloStream(
+	ctx context.Context,
+	req *connect.Request[greeterv1.HelloRequest],
+	stream *connect.ServerStream[greeterv1.HelloReply],
+) error {
+	name := req.Msg.Name
+	for i := 0; i < 3; i++ {
+		if err := stream.Send(&greeterv1.HelloReply{
+			Message: fmt.Sprintf("Hello %s! (%d)", name, i+1),
+		}); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+	greeter := &GreeterServer{}
+	mux := http.NewServeMux()
+	path, handler := greeterv1connect.NewGreeterHandler(greeter)
+	mux.Handle(path, handler)
+
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: h2c.NewHandler(mux, &http2.Server{}),
 	}
-	s := grpc.NewServer()
-	pb.RegisterGreeterServer(s, &server{})
+
 	go func() {
-		if err := s.Serve(lis); err != nil {
+		log.Println("Server started at :8080")
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("failed to serve: %v", err)
 		}
 	}()
 
-	log.Println("server started at :50051")
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Interrupt)
 	<-ch
-	log.Println("stopping server")
-	s.GracefulStop()
+	log.Println("Stopping server...")
+	server.Close()
 }

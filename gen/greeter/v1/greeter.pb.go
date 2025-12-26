@@ -4,7 +4,7 @@
 // 	protoc        v3.21.12
 // source: proto/greeter.proto
 
-package pb
+package greeterv1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -121,7 +121,7 @@ const file_proto_greeter_proto_rawDesc = "" +
 	"\amessage\x18\x01 \x01(\tR\amessage2\x81\x01\n" +
 	"\aGreeter\x126\n" +
 	"\bSayHello\x12\x15.greeter.HelloRequest\x1a\x13.greeter.HelloReply\x12>\n" +
-	"\x0eSayHelloStream\x12\x15.greeter.HelloRequest\x1a\x13.greeter.HelloReply0\x01B\x12Z\x10grpc_practice/pbb\x06proto3"
+	"\x0eSayHelloStream\x12\x15.greeter.HelloRequest\x1a\x13.greeter.HelloReply0\x01B(Z&grpc_practice/gen/greeter/v1;greeterv1b\x06proto3"
 
 var (
 	file_proto_greeter_proto_rawDescOnce sync.Once

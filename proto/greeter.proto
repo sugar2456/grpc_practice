@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package greeter;
 
-option go_package = "grpc_practice/pb";
+option go_package = "grpc_practice/gen/greeter/v1;greeterv1";
 
 // 挨拶サービス
 service Greeter {
