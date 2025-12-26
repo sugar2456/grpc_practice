@@ -37,14 +37,19 @@ const (
 	GreeterSayHelloProcedure = "/greeter.Greeter/SayHello"
 	// GreeterSayHelloStreamProcedure is the fully-qualified name of the Greeter's SayHelloStream RPC.
 	GreeterSayHelloStreamProcedure = "/greeter.Greeter/SayHelloStream"
+	// GreeterGetUserGreetingsProcedure is the fully-qualified name of the Greeter's GetUserGreetings
+	// RPC.
+	GreeterGetUserGreetingsProcedure = "/greeter.Greeter/GetUserGreetings"
 )
 
 // GreeterClient is a client for the greeter.Greeter service.
 type GreeterClient interface {
-	// 単純なリクエスト/レスポンス
+	// 挨拶を作成
 	SayHello(context.Context, *connect.Request[v1.HelloRequest]) (*connect.Response[v1.HelloReply], error)
 	// サーバーストリーミング
 	SayHelloStream(context.Context, *connect.Request[v1.HelloRequest]) (*connect.ServerStreamForClient[v1.HelloReply], error)
+	// ユーザーの挨拶一覧を取得
+	GetUserGreetings(context.Context, *connect.Request[v1.GetUserGreetingsRequest]) (*connect.Response[v1.GetUserGreetingsReply], error)
 }
 
 // NewGreeterClient constructs a client for the greeter.Greeter service. By default, it uses the
@@ -70,13 +75,20 @@ func NewGreeterClient(httpClient connect.HTTPClient, baseURL string, opts ...con
 			connect.WithSchema(greeterMethods.ByName("SayHelloStream")),
 			connect.WithClientOptions(opts...),
 		),
+		getUserGreetings: connect.NewClient[v1.GetUserGreetingsRequest, v1.GetUserGreetingsReply](
+			httpClient,
+			baseURL+GreeterGetUserGreetingsProcedure,
+			connect.WithSchema(greeterMethods.ByName("GetUserGreetings")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // greeterClient implements GreeterClient.
 type greeterClient struct {
-	sayHello       *connect.Client[v1.HelloRequest, v1.HelloReply]
-	sayHelloStream *connect.Client[v1.HelloRequest, v1.HelloReply]
+	sayHello         *connect.Client[v1.HelloRequest, v1.HelloReply]
+	sayHelloStream   *connect.Client[v1.HelloRequest, v1.HelloReply]
+	getUserGreetings *connect.Client[v1.GetUserGreetingsRequest, v1.GetUserGreetingsReply]
 }
 
 // SayHello calls greeter.Greeter.SayHello.
@@ -89,12 +101,19 @@ func (c *greeterClient) SayHelloStream(ctx context.Context, req *connect.Request
 	return c.sayHelloStream.CallServerStream(ctx, req)
 }
 
+// GetUserGreetings calls greeter.Greeter.GetUserGreetings.
+func (c *greeterClient) GetUserGreetings(ctx context.Context, req *connect.Request[v1.GetUserGreetingsRequest]) (*connect.Response[v1.GetUserGreetingsReply], error) {
+	return c.getUserGreetings.CallUnary(ctx, req)
+}
+
 // GreeterHandler is an implementation of the greeter.Greeter service.
 type GreeterHandler interface {
-	// 単純なリクエスト/レスポンス
+	// 挨拶を作成
 	SayHello(context.Context, *connect.Request[v1.HelloRequest]) (*connect.Response[v1.HelloReply], error)
 	// サーバーストリーミング
 	SayHelloStream(context.Context, *connect.Request[v1.HelloRequest], *connect.ServerStream[v1.HelloReply]) error
+	// ユーザーの挨拶一覧を取得
+	GetUserGreetings(context.Context, *connect.Request[v1.GetUserGreetingsRequest]) (*connect.Response[v1.GetUserGreetingsReply], error)
 }
 
 // NewGreeterHandler builds an HTTP handler from the service implementation. It returns the path on
@@ -116,12 +135,20 @@ func NewGreeterHandler(svc GreeterHandler, opts ...connect.HandlerOption) (strin
 		connect.WithSchema(greeterMethods.ByName("SayHelloStream")),
 		connect.WithHandlerOptions(opts...),
 	)
+	greeterGetUserGreetingsHandler := connect.NewUnaryHandler(
+		GreeterGetUserGreetingsProcedure,
+		svc.GetUserGreetings,
+		connect.WithSchema(greeterMethods.ByName("GetUserGreetings")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/greeter.Greeter/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case GreeterSayHelloProcedure:
 			greeterSayHelloHandler.ServeHTTP(w, r)
 		case GreeterSayHelloStreamProcedure:
 			greeterSayHelloStreamHandler.ServeHTTP(w, r)
+		case GreeterGetUserGreetingsProcedure:
+			greeterGetUserGreetingsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -137,4 +164,8 @@ func (UnimplementedGreeterHandler) SayHello(context.Context, *connect.Request[v1
 
 func (UnimplementedGreeterHandler) SayHelloStream(context.Context, *connect.Request[v1.HelloRequest], *connect.ServerStream[v1.HelloReply]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("greeter.Greeter.SayHelloStream is not implemented"))
+}
+
+func (UnimplementedGreeterHandler) GetUserGreetings(context.Context, *connect.Request[v1.GetUserGreetingsRequest]) (*connect.Response[v1.GetUserGreetingsReply], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("greeter.Greeter.GetUserGreetings is not implemented"))
 }

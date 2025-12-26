@@ -6,17 +6,36 @@ option go_package = "grpc_practice/gen/greeter/v1;greeterv1";
 
 // 挨拶サービス
 service Greeter {
-  // 単純なリクエスト/レスポンス
+  // 挨拶を作成
   rpc SayHello (HelloRequest) returns (HelloReply);
 
   // サーバーストリーミング
   rpc SayHelloStream (HelloRequest) returns (stream HelloReply);
+
+  // ユーザーの挨拶一覧を取得
+  rpc GetUserGreetings (GetUserGreetingsRequest) returns (GetUserGreetingsReply);
 }
 
 message HelloRequest {
-  string name = 1;
+  string user_id = 1;
+  string name = 2;
 }
 
 message HelloReply {
-  string message = 1;
+  string id = 1;
+  string message = 2;
+}
+
+message GetUserGreetingsRequest {
+  string user_id = 1;
+}
+
+message GetUserGreetingsReply {
+  repeated Greeting greetings = 1;
+}
+
+message Greeting {
+  string id = 1;
+  string name = 2;
+  string message = 3;
 }

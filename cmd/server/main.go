@@ -26,6 +26,14 @@ func main() {
 				infraRepo.NewInMemoryGreetingRepository,
 				fx.As(new(repository.GreetingRepository)),
 			),
+			fx.Annotate(
+				infraRepo.NewInMemoryUserRepository,
+				fx.As(new(repository.UserRepository)),
+			),
+			fx.Annotate(
+				infraRepo.NewInMemoryUserGreetingRepository,
+				fx.As(new(repository.UserGreetingRepository)),
+			),
 			// Usecase層
 			usecase.NewGreeterUsecase,
 			// Handler層

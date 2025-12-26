@@ -23,7 +23,8 @@ const (
 
 type HelloRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -58,6 +59,13 @@ func (*HelloRequest) Descriptor() ([]byte, []int) {
 	return file_proto_greeter_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *HelloRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
 func (x *HelloRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -67,7 +75,8 @@ func (x *HelloRequest) GetName() string {
 
 type HelloReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -102,7 +111,162 @@ func (*HelloReply) Descriptor() ([]byte, []int) {
 	return file_proto_greeter_proto_rawDescGZIP(), []int{1}
 }
 
+func (x *HelloReply) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 func (x *HelloReply) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type GetUserGreetingsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserGreetingsRequest) Reset() {
+	*x = GetUserGreetingsRequest{}
+	mi := &file_proto_greeter_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserGreetingsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserGreetingsRequest) ProtoMessage() {}
+
+func (x *GetUserGreetingsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_greeter_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserGreetingsRequest.ProtoReflect.Descriptor instead.
+func (*GetUserGreetingsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_greeter_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetUserGreetingsRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GetUserGreetingsReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Greetings     []*Greeting            `protobuf:"bytes,1,rep,name=greetings,proto3" json:"greetings,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserGreetingsReply) Reset() {
+	*x = GetUserGreetingsReply{}
+	mi := &file_proto_greeter_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserGreetingsReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserGreetingsReply) ProtoMessage() {}
+
+func (x *GetUserGreetingsReply) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_greeter_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserGreetingsReply.ProtoReflect.Descriptor instead.
+func (*GetUserGreetingsReply) Descriptor() ([]byte, []int) {
+	return file_proto_greeter_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetUserGreetingsReply) GetGreetings() []*Greeting {
+	if x != nil {
+		return x.Greetings
+	}
+	return nil
+}
+
+type Greeting struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Greeting) Reset() {
+	*x = Greeting{}
+	mi := &file_proto_greeter_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Greeting) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Greeting) ProtoMessage() {}
+
+func (x *Greeting) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_greeter_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Greeting.ProtoReflect.Descriptor instead.
+func (*Greeting) Descriptor() ([]byte, []int) {
+	return file_proto_greeter_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Greeting) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Greeting) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Greeting) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
@@ -113,15 +277,26 @@ var File_proto_greeter_proto protoreflect.FileDescriptor
 
 const file_proto_greeter_proto_rawDesc = "" +
 	"\n" +
-	"\x13proto/greeter.proto\x12\agreeter\"\"\n" +
-	"\fHelloRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\"&\n" +
+	"\x13proto/greeter.proto\x12\agreeter\";\n" +
+	"\fHelloRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\"6\n" +
 	"\n" +
-	"HelloReply\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2\x81\x01\n" +
+	"HelloReply\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"2\n" +
+	"\x17GetUserGreetingsRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"H\n" +
+	"\x15GetUserGreetingsReply\x12/\n" +
+	"\tgreetings\x18\x01 \x03(\v2\x11.greeter.GreetingR\tgreetings\"H\n" +
+	"\bGreeting\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage2\xd7\x01\n" +
 	"\aGreeter\x126\n" +
 	"\bSayHello\x12\x15.greeter.HelloRequest\x1a\x13.greeter.HelloReply\x12>\n" +
-	"\x0eSayHelloStream\x12\x15.greeter.HelloRequest\x1a\x13.greeter.HelloReply0\x01B(Z&grpc_practice/gen/greeter/v1;greeterv1b\x06proto3"
+	"\x0eSayHelloStream\x12\x15.greeter.HelloRequest\x1a\x13.greeter.HelloReply0\x01\x12T\n" +
+	"\x10GetUserGreetings\x12 .greeter.GetUserGreetingsRequest\x1a\x1e.greeter.GetUserGreetingsReplyB(Z&grpc_practice/gen/greeter/v1;greeterv1b\x06proto3"
 
 var (
 	file_proto_greeter_proto_rawDescOnce sync.Once
@@ -135,21 +310,27 @@ func file_proto_greeter_proto_rawDescGZIP() []byte {
 	return file_proto_greeter_proto_rawDescData
 }
 
-var file_proto_greeter_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_proto_greeter_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_proto_greeter_proto_goTypes = []any{
-	(*HelloRequest)(nil), // 0: greeter.HelloRequest
-	(*HelloReply)(nil),   // 1: greeter.HelloReply
+	(*HelloRequest)(nil),            // 0: greeter.HelloRequest
+	(*HelloReply)(nil),              // 1: greeter.HelloReply
+	(*GetUserGreetingsRequest)(nil), // 2: greeter.GetUserGreetingsRequest
+	(*GetUserGreetingsReply)(nil),   // 3: greeter.GetUserGreetingsReply
+	(*Greeting)(nil),                // 4: greeter.Greeting
 }
 var file_proto_greeter_proto_depIdxs = []int32{
-	0, // 0: greeter.Greeter.SayHello:input_type -> greeter.HelloRequest
-	0, // 1: greeter.Greeter.SayHelloStream:input_type -> greeter.HelloRequest
-	1, // 2: greeter.Greeter.SayHello:output_type -> greeter.HelloReply
-	1, // 3: greeter.Greeter.SayHelloStream:output_type -> greeter.HelloReply
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	4, // 0: greeter.GetUserGreetingsReply.greetings:type_name -> greeter.Greeting
+	0, // 1: greeter.Greeter.SayHello:input_type -> greeter.HelloRequest
+	0, // 2: greeter.Greeter.SayHelloStream:input_type -> greeter.HelloRequest
+	2, // 3: greeter.Greeter.GetUserGreetings:input_type -> greeter.GetUserGreetingsRequest
+	1, // 4: greeter.Greeter.SayHello:output_type -> greeter.HelloReply
+	1, // 5: greeter.Greeter.SayHelloStream:output_type -> greeter.HelloReply
+	3, // 6: greeter.Greeter.GetUserGreetings:output_type -> greeter.GetUserGreetingsReply
+	4, // [4:7] is the sub-list for method output_type
+	1, // [1:4] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_proto_greeter_proto_init() }
@@ -163,7 +344,7 @@ func file_proto_greeter_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_greeter_proto_rawDesc), len(file_proto_greeter_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
